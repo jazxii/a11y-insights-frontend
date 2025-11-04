@@ -26,7 +26,8 @@ const DEFAULT_PAYLOAD: DefectPayload = {
     "When selecting a pump, there will a PICK YOUR PUMP screen: When clicking on the Fuel button from the popup window when clicking on more button on the home screen, the PICK YOUR PUMP screen appears which appears to be moving up and down. - When PICK YOUR PUMP screen comes in, there is a popup which appears with details. Once the popup is open, the focus goes through the parent page behind first before going into the popup screen.",
 };
 
-const API_URL = "https://a11y-insights.onrender.com/v4/document-defects";
+// const API_URL = "https://a11y-insights.onrender.com/v4/document-defects";
+const API_URL = "http://127.0.0.1:8000/v4/document-defects";
 
 const DocumentDefect: React.FC<{ dark?: boolean }> = ({ dark = true }) => {
   const [payload, setPayload] = useState<DefectPayload>(DEFAULT_PAYLOAD);
