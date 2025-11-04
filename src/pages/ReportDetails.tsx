@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Card, Button, Input } from "../components/ui";
+import { Card, Button, Input, Textarea } from "../components/ui";
 import { getReportById, updateReportById, deleteReportById } from "../services/api";
 import { toast } from "react-toastify";
 
@@ -84,33 +84,33 @@ const ReportDetails: React.FC<Props> = ({ dark }) => {
   };
 
   const handleSaveChecklistEdit = async () => {
-    if (!report || editIndex === null || !editItem) return;
-    try {
-      setIsSaving(true);
+  if (!report || editIndex === null || !editItem) return;
+  try {
+    setIsSaving(true);
 
-      const updatedChecklist = [...report.json_report.developer_checklist];
-      updatedChecklist[editIndex] = editItem;
+    const updatedChecklist = [...report.json_report.developer_checklist];
+    updatedChecklist[editIndex] = editItem;
 
-      const payload = {
-        ...report,
-        json_report: {
-          ...report.json_report,
-          developer_checklist: updatedChecklist,
-        },
-      };
+    const payload = {
+      json_report: {
+        ...report.json_report,
+        developer_checklist: updatedChecklist,
+      },
+    };
 
-      await updateReportById(report.ticket_id, payload);
-      toast.success("✅ Checklist item updated successfully!");
-      setEditItem(null);
-      setEditIndex(null);
-      await fetchReport();
-    } catch (error) {
-      console.error("Error updating checklist:", error);
-      toast.error("Failed to update checklist item.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    await updateReportById(report.ticket_id, payload);
+    toast.success("✅ Checklist item updated successfully!");
+    setEditItem(null);
+    setEditIndex(null);
+    await fetchReport();
+  } catch (error) {
+    console.error("Error updating checklist:", error);
+    toast.error("Failed to update checklist item.");
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   /** ----------- Acceptance Criteria Editing ----------- */
   const openCriteriaModal = (value = "", index: number | null = null) => {
@@ -120,38 +120,38 @@ const ReportDetails: React.FC<Props> = ({ dark }) => {
   };
 
   const handleSaveCriteria = async () => {
-    if (!report) return;
-    try {
-      setIsSaving(true);
+  if (!report) return;
+  try {
+    setIsSaving(true);
 
-      let updatedCriteria = [...report.json_report.acceptance_criteria];
-      if (editCriteriaIndex !== null) {
-        updatedCriteria[editCriteriaIndex] = criteriaValue;
-      } else {
-        updatedCriteria.push(criteriaValue);
-      }
-
-      const payload = {
-        ...report,
-        json_report: {
-          ...report.json_report,
-          acceptance_criteria: updatedCriteria,
-        },
-      };
-
-      await updateReportById(report.ticket_id, payload);
-      toast.success("✅ Acceptance criteria updated successfully!");
-      setCriteriaModalOpen(false);
-      setCriteriaValue("");
-      setEditCriteriaIndex(null);
-      await fetchReport();
-    } catch (error) {
-      console.error("Error updating criteria:", error);
-      toast.error("Failed to update acceptance criteria.");
-    } finally {
-      setIsSaving(false);
+    let updatedCriteria = [...report.json_report.acceptance_criteria];
+    if (editCriteriaIndex !== null) {
+      updatedCriteria[editCriteriaIndex] = criteriaValue;
+    } else {
+      updatedCriteria.push(criteriaValue);
     }
-  };
+
+    const payload = {
+      json_report: {
+        ...report.json_report,
+        acceptance_criteria: updatedCriteria,
+      },
+    };
+
+    await updateReportById(report.ticket_id, payload);
+    toast.success("✅ Acceptance criteria updated successfully!");
+    setCriteriaModalOpen(false);
+    setCriteriaValue("");
+    setEditCriteriaIndex(null);
+    await fetchReport();
+  } catch (error) {
+    console.error("Error updating criteria:", error);
+    toast.error("Failed to update acceptance criteria.");
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   const handleDeleteCriteria = async (index: number) => {
     if (!report) return;
@@ -261,23 +261,74 @@ const ReportDetails: React.FC<Props> = ({ dark }) => {
           ))}
         </ul>
       </Card>
-
-      {/* Checklist Edit Modal */}
+{/* Modal for Editing Checklist */}
       {editItem && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           <div className={`w-full max-w-3xl rounded-xl shadow-lg ${dark ? "bg-gray-900 text-white" : "bg-white text-gray-900"} p-6`}>
             <h3 className="text-xl font-semibold mb-4">Edit Checklist Item</h3>
-            <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
-              <Input value={editItem.item} onChange={(e) => handleEditChange("item", e.target.value)} placeholder="Checklist item" />
-              <textarea
+
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+              <Input
+                value={editItem.item}
+                onChange={(e) => handleEditChange("item", e.target.value)}
+                placeholder="Checklist item title"
+                className="w-full"
+              />
+              <Textarea
                 value={editItem.intent}
                 onChange={(e) => handleEditChange("intent", e.target.value)}
                 placeholder="Intent"
-                className="w-full rounded-md border p-2 text-sm h-20"
+                className="w-full h-20"
               />
+              <Textarea
+                value={editItem.non_accessible_example}
+                onChange={(e) => handleEditChange("non_accessible_example", e.target.value)}
+                placeholder="Non-accessible example code"
+                className="w-full h-28 font-mono"
+              />
+              <Textarea
+                value={editItem.accessible_example}
+                onChange={(e) => handleEditChange("accessible_example", e.target.value)}
+                placeholder="Accessible example code"
+                className="w-full h-28 font-mono"
+              />
+              <Input
+                value={editItem.implementation_tips.web || ""}
+                onChange={(e) =>
+                  handleEditChange("implementation_tips", { web: e.target.value })
+                }
+                placeholder="Implementation tips (Web)"
+                className="w-full"
+              />
+              <div className="grid grid-cols-3 gap-3">
+                <Input
+                  value={editItem.wcag_reference.id}
+                  onChange={(e) =>
+                    handleEditChange("wcag_reference", { ...editItem.wcag_reference, id: e.target.value })
+                  }
+                  placeholder="WCAG ID"
+                />
+                <Input
+                  value={editItem.wcag_reference.name}
+                  onChange={(e) =>
+                    handleEditChange("wcag_reference", { ...editItem.wcag_reference, name: e.target.value })
+                  }
+                  placeholder="WCAG Name"
+                />
+                <Input
+                  value={editItem.wcag_reference.url}
+                  onChange={(e) =>
+                    handleEditChange("wcag_reference", { ...editItem.wcag_reference, url: e.target.value })
+                  }
+                  placeholder="WCAG URL"
+                />
+              </div>
             </div>
+
             <div className="flex justify-end gap-3 mt-6">
-              <Button onClick={() => setEditItem(null)} className="bg-gray-700 hover:bg-gray-800 text-white">Cancel</Button>
+              <Button onClick={() => setEditItem(null)} className="bg-gray-700 hover:bg-gray-800 text-white">
+                Cancel
+              </Button>
               <Button onClick={handleSaveChecklistEdit} disabled={isSaving} className="bg-green-600 hover:bg-green-700 text-white">
                 {isSaving ? "Saving..." : "Save Changes"}
               </Button>
@@ -285,6 +336,9 @@ const ReportDetails: React.FC<Props> = ({ dark }) => {
           </div>
         </div>
       )}
+
+
+
 
       {/* Acceptance Criteria Modal */}
       {criteriaModalOpen && (
