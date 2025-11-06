@@ -8,10 +8,10 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-export const analyzeUserStory = async (data: any) => {
-  const res = await api.post('/v5/analyze', data);
-  return res.data; // includes created_at, updated_at, ticket_id
-};
+// export const analyzeUserStory = async (data: any) => {
+//   const res = await api.post('/v5/analyze', data);
+//   return res.data; // includes created_at, updated_at, ticket_id
+// };
 
 const AUTH_TOKEN = import.meta.env.VITE_API_KEY || '';
 
@@ -28,26 +28,34 @@ export const getReports = async (platform = "iOS", skip = 0, limit = 100) => {
   return [];
 };
 
-export const getReportById = async (ticketId: string, platform = "iOS") => {
-  const res = await api.get(`/v5/reports/${ticketId}`, {
-    params: { platform },
-    headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-  });
+// Generic analyzer for user story or JIRA ticket
+export const analyzeUserStory = async (payload: any) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/v5/analyze`, payload);
+    return response.data; // return parsed JSON (not full axios response)
+  } catch (error: any) {
+    console.error("❌ analyzeUserStory API Error:", error);
+    throw error.response?.data || error;
+  }
+};
+
+// Fetch a report by ticket ID
+export const getReportById = async (id: string, platform?: string) => {
+  const url = platform
+    ? `${API_BASE_URL}/v5/reports/${id}?platform=${platform}`
+    : `${API_BASE_URL}/v5/reports/${id}`;
+  const res = await axios.get(url);
   return res.data;
 };
 
-export const deleteReportById = async (ticketId: string, platform = "iOS") => {
-  const res = await api.delete(`/v5/reports/${ticketId}`, {
-    params: { platform },
-    headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-  });
+// Update a report
+export const updateReportById = async (id: string, payload: any) => {
+  const res = await axios.put(`${API_BASE_URL}/v5/reports/${id}`, payload);
   return res.data;
 };
 
-export const updateReportById = async (ticketId: string, payload: any, platform = "iOS") => {
-  const res = await api.put(`/v5/reports/${ticketId}`, payload, {
-    params: { platform },
-    headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-  });
+// Delete a report
+export const deleteReportById = async (id: string) => {
+  const res = await axios.delete(`${API_BASE_URL}/v5/reports/${id}`);
   return res.data;
 };

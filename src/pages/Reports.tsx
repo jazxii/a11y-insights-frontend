@@ -33,7 +33,7 @@ useEffect(() => {
   const fetchReports = async () => {
     try {
       setLoading(true);
-      const data = await getReports("iOS", 0, 100);
+      const data = await getReports("Web", 0, 100);
       setReports(Array.isArray(data) ? data : []); // fallback safety
     } catch (error) {
       console.error("Failed to fetch reports:", error);
@@ -68,7 +68,7 @@ useEffect(() => {
             {reports.map((report) => (
               <tr key={report.ticket_id} className={`${dark ? "border-b border-gray-800" : "border-b border-gray-200"}`}>
                 <td className="p-2 font-medium">{report.ticket_id}</td>
-                <td className="p-2">{report.summary}</td>
+                <td className="p-2 w-1/2">{report.summary}</td>
                 <td className="p-2">
                   {new Date(report.created_at).toLocaleString(undefined, {
                     dateStyle: "medium",
